@@ -131,6 +131,9 @@ class ASTModel(nn.Module):
             self.v = audio_model.module.v
             self.original_embedding_dim = self.v.pos_embed.shape[2]
             self.mlp_head = nn.Sequential(nn.LayerNorm(self.original_embedding_dim), nn.Linear(self.original_embedding_dim, label_dim))
+            #self.mlp_head_2 = nn.Sequential(nn.LayerNorm(self.original_embedding_dim), nn.Linear(self.original_embedding_dim, label_dim),
+              #nn.Linear(label_dim, label_dim),                                
+             #nn.Linear(label_dim, label_dim)                              )
 
             f_dim, t_dim = self.get_shape(fstride, tstride, input_fdim, input_tdim)
             num_patches = f_dim * t_dim
@@ -150,16 +153,33 @@ class ASTModel(nn.Module):
             self.v.pos_embed = nn.Parameter(torch.cat([self.v.pos_embed[:, :2, :].detach(), new_pos_embed], dim=1))
             
             ##reprogram layer
-            #self.repr = nn.Parameter(torch.Tensor(1,1024,128))
+            self.repr = nn.Parameter(torch.Tensor(1,1024,128))
             #self.mean = nn.Parameter(torch.Tensor(1))
             #self.std = nn.Parameter(torch.Tensor(1))
             #self.gaussian = nn.Parameter(torch.normal(0, 1, size=(1024, 128)))
-            #self.re_cnn = torch.nn.Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=1)
-            #self.re_cnn_2 = torch.nn.Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=1)
+            self.re_cnn = torch.nn.Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=1)
+            self.re_cnn_2 = torch.nn.Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=1)
             #self.delta = torch.nn.Parameter(torch.Tensor(1,1024,128), requires_grad=True)
             #torch.nn.init.xavier_uniform_(self.delta)
-            self.delta = torch.nn.Parameter(torch.Tensor(1,1024,128), requires_grad=True)
-            torch.nn.init.normal_(self.delta)
+            #self.delta = torch.nn.Parameter(torch.Tensor(1,1024,128), requires_grad=True)
+            #torch.nn.init.normal_(self.delta)
+            self.unet_1 = nn.Sequential(nn.Conv2d(1, 4, kernel_size=3, padding=1, bias=False),
+                                        nn.BatchNorm2d(4),
+                                        nn.ReLU(inplace=True),
+                                        nn.MaxPool2d(2))
+            
+            self.unet_2 = nn.Sequential(nn.Conv2d(4, 4, kernel_size=3, padding=1, bias=False),
+                                        nn.BatchNorm2d(4),
+                                        nn.ReLU(inplace=True),
+                                        nn.MaxPool2d(2))
+            self.unet_up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+            self.unet_3 = nn.Sequential(nn.Conv2d(4, 4, kernel_size=3, padding=1, bias=False),
+                                        nn.BatchNorm2d(4),
+                                        nn.ReLU(inplace=True))
+            self.unet_4 = nn.Sequential(nn.Conv2d(4, 1, kernel_size=3, padding=1, bias=False),
+                                        nn.BatchNorm2d(1),
+                                        nn.ReLU(inplace=True))
+                    
             
 
     def get_shape(self, fstride, tstride, input_fdim=128, input_tdim=1024):
@@ -181,16 +201,24 @@ class ASTModel(nn.Module):
        # print(x.size(dim=0))24
        # print(x.size(dim=1))1024
        # print(x.size(dim=2))128
-        x = x + self.delta.repeat(x.size(dim=0),1,1)
+        #x = x + self.delta.repeat(x.size(dim=0),1,1)
         
-        #self.std[self.std<=0] = 0.1
-        #gaussian = random.normal(loc=self.mean.detach().cpu().numpy(), scale=self.std.detach().cpu().numpy(), size=(1024, 128))
-        #gaussian = torch.normal(self.mean[0].float(), self.std[0].float(), size=(1024, 128))
-        #gaussian = torch.from_numpy(gaussian).cuda()
-        #gaussian = gaussian.cuda()
-        #x = x + gaussian.repeat(x.size(dim=0),1,1)
+        
         
         x = x.unsqueeze(1)
+        x1 = self.unet_1(x)
+        
+        x2 = self.unet_2(x1)
+        
+        x3 = self.unet_up(x2)
+        
+        x4 = self.unet_3(x3+x1)
+        
+        x4 = self.unet_up(x4)
+        
+        x =  self.unet_4(x4+x)
+        
+        
         #x = self.re_cnn(x)
         #x = self.re_cnn_2(x)
         #x = x + self.repr.repeat(x.size(dim=0),1,1,1)
