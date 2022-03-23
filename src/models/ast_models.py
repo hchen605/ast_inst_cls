@@ -130,10 +130,12 @@ class ASTModel(nn.Module):
             audio_model.load_state_dict(sd, strict=False)
             self.v = audio_model.module.v
             self.original_embedding_dim = self.v.pos_embed.shape[2]
-            self.mlp_head = nn.Sequential(nn.LayerNorm(self.original_embedding_dim), nn.Linear(self.original_embedding_dim, label_dim))
-            #self.mlp_head_2 = nn.Sequential(nn.LayerNorm(self.original_embedding_dim), nn.Linear(self.original_embedding_dim, label_dim),
+            #self.mlp_head = nn.Sequential(nn.LayerNorm(self.original_embedding_dim), nn.Linear(self.original_embedding_dim, label_dim))
+            self.mlp_head_2 = nn.Sequential(nn.LayerNorm(self.original_embedding_dim), nn.Linear(self.original_embedding_dim, label_dim),
+              #nn.Sigmoid(),
+              nn.LayerNorm(label_dim),
               #nn.Linear(label_dim, label_dim),                                
-             #nn.Linear(label_dim, label_dim)                              )
+             nn.Linear(label_dim, label_dim)                              )
 
             f_dim, t_dim = self.get_shape(fstride, tstride, input_fdim, input_tdim)
             num_patches = f_dim * t_dim
@@ -168,15 +170,22 @@ class ASTModel(nn.Module):
                                         nn.ReLU(inplace=True),
                                         nn.MaxPool2d(2))
             
-            self.unet_2 = nn.Sequential(nn.Conv2d(4, 4, kernel_size=3, padding=1, bias=False),
-                                        nn.BatchNorm2d(4),
+            self.unet_2 = nn.Sequential(nn.Conv2d(4, 8, kernel_size=3, padding=1, bias=False),
+                                        nn.BatchNorm2d(8),
+                                        nn.ReLU(inplace=True),
+                                        nn.MaxPool2d(2))
+            self.unet_3 = nn.Sequential(nn.Conv2d(8, 8, kernel_size=3, padding=1, bias=False),
+                                        nn.BatchNorm2d(8),
                                         nn.ReLU(inplace=True),
                                         nn.MaxPool2d(2))
             self.unet_up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-            self.unet_3 = nn.Sequential(nn.Conv2d(4, 4, kernel_size=3, padding=1, bias=False),
+            self.unet_4 = nn.Sequential(nn.Conv2d(8, 4, kernel_size=3, padding=1, bias=False),
                                         nn.BatchNorm2d(4),
                                         nn.ReLU(inplace=True))
-            self.unet_4 = nn.Sequential(nn.Conv2d(4, 1, kernel_size=3, padding=1, bias=False),
+            self.unet_5 = nn.Sequential(nn.Conv2d(4, 1, kernel_size=3, padding=1, bias=False),
+                                        nn.BatchNorm2d(1),
+                                        nn.ReLU(inplace=True))
+            self.unet_6 = nn.Sequential(nn.Conv2d(1, 1, kernel_size=3, padding=1, bias=False),
                                         nn.BatchNorm2d(1),
                                         nn.ReLU(inplace=True))
                     
@@ -207,16 +216,14 @@ class ASTModel(nn.Module):
         
         x = x.unsqueeze(1)
         x1 = self.unet_1(x)
-        
         x2 = self.unet_2(x1)
-        
-        x3 = self.unet_up(x2)
-        
-        x4 = self.unet_3(x3+x1)
-        
+        x3 = self.unet_3(x2)
+        x3 = self.unet_up(x3)
+        x4 = self.unet_4(x3+x2)
         x4 = self.unet_up(x4)
-        
-        x =  self.unet_4(x4+x)
+        x5 = self.unet_5(x1+x4)
+        x5 = self.unet_up(x5)
+        x =  self.unet_6(x5+x)
         
         
         #x = self.re_cnn(x)
@@ -243,7 +250,7 @@ class ASTModel(nn.Module):
         x = self.v.norm(x)
         x = (x[:, 0] + x[:, 1]) / 2
 
-        x = self.mlp_head(x)
+        x = self.mlp_head_2(x)
         return x
 
 if __name__ == '__main__':
