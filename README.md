@@ -78,6 +78,11 @@ Proposal
 - AST + CNN Reprogramming (AST-CNNRP)
 - AST + U-Net Reprogramming (AST-URP)
 
-<img src="https://github.com/hchen605/ast_inst_cls/blob/master/fig/reprogramming%20result.png" width="400" height="400" />
+#### The F1-score comparison:
+<img src="https://github.com/hchen605/ast_inst_cls/blob/master/fig/Ins_f1_box_rf.png" width="700" height="300" />
 
-## Complexity Comparison
+#### Instrument-wise F1-score:
+<img src="https://github.com/hchen605/ast_inst_cls/blob/master/fig/Ins_f1_all_cmp_wide_mmm.png" width="900" height="330" />
+
+#### Complexity Comparison
+<img src="https://github.com/hchen605/ast_inst_cls/blob/master/fig/complexity_comparison.png" width="850" height="100" />
