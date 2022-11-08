@@ -17,7 +17,7 @@ How to detect and classify with insufficient labels?​
 - Complex model?
 - Advanced semi/self-supervised learning (SSL) approach to handle missing labels
 - What else can we do?
-
+ 
 
 ## Reprogramming
 Leveraging the power of pre-trained models
