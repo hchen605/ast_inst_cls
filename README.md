@@ -1,8 +1,9 @@
 # Music Instrument Classification Reprogrammed
 
-## Reprogramming a Pre-trained Model for Music Classification Tasks
+#### Reprogramming a Pre-trained Model for Music Classification Tasks
 
 This repo contains the background and implementation (in PyTorch) of the paper: "Music Instrument Classification Reprogrammed" proposed in the 2023 International Conference of MultiMedia Modelling (MMM23).
+
 
 ## Usage
 
@@ -67,9 +68,15 @@ Pre-trained model
 Baseline​
 
 - Random Forest (RF)
-- Input + AST model + linear layer​
+- CNN baseline (CNN-BS)
+- AST pre-trained model (AST-BS)​
+- Mean Teacher (MT)
 
-
+Proposal
+- AST transfer learning (AST-TL)
+- AST + Noise Reprogramming (AST-NRP)
+- AST + CNN Reprogramming (AST-CNNRP)
+- AST + U-Net Reprogramming (AST-URP)
 
 <img src="https://github.com/hchen605/ast_inst_cls/blob/master/fig/reprogramming%20result.png" width="400" height="400" />
 
