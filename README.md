@@ -1,6 +1,18 @@
-# ast_inst_cls
+# Music Instrument Classification Reprogrammed
 
-# Reprogramming a Pre-trained Model for Music Classification Tasks
+## Reprogramming a Pre-trained Model for Music Classification Tasks
+
+This repo contains the background and implementation (in PyTorch) of the paper: "Music Instrument Classification Reprogrammed" proposed in the 2023 International Conference of MultiMedia Modelling (MMM23).
+
+## Usage
+
+Please install the environment with the `ast_repr.yml`
+
+Command: 
+- `cd egs/openmic`
+- source `run.sh`
+
+The default will run the U-Net reprogramming evaluation over OpenMic dataset.
 
 ## Problems of music classification task
 Challenge of collecting large-scale datasets
@@ -27,7 +39,18 @@ Leveraging the power of pre-trained models
 
 <img src="https://github.com/hchen605/ast_inst_cls/blob/master/fig/reprogramming%20blk.png" width="9500" height="400" />
 
-## Preliminary results on music instrument classification
+Adopted/Proposed Reprogramming method​
+
+1. Adversarial programming​
+
+2. Noise reprogramming​
+
+3. Input CNN transformation​
+
+4. Input U-Net transformation​
+
+w/ simple output linear layer label mapping
+## Music instrument classification results
 
 Polyphonic music instrument classification​
 
@@ -39,20 +62,15 @@ Pre-trained model
 
 - Audio Spectrogram Transformers (AST)​
 
-- SOTA evaluation over AudioSet​
+- SOTA evaluation over AudioSet/SpeechCommand​
 
 Baseline​
 
-- Input + pre-trained model + linear layer​
+- Random Forest (RF)
+- Input + AST model + linear layer​
 
-Reprogramming method​
 
-1. Adversarial programming​
-
-2. Noise addition​
-
-3. Input CNN transformation​
-
-w/ simple output linear layer label mapping
 
 <img src="https://github.com/hchen605/ast_inst_cls/blob/master/fig/reprogramming%20result.png" width="400" height="400" />
+
+## Complexity Comparison
