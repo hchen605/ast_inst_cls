@@ -1,3 +1,4 @@
+# modified from:
 # -*- coding: utf-8 -*-
 # @Time    : 6/11/21 12:57 AM
 # @Author  : Yuan Gong
@@ -110,7 +111,6 @@ Y_mask_test = Y_mask[idx_test]
 
 print('loading data ..,')
 
-
 x_train = np.load('train_music.npy')
 x_test = np.load('test_music.npy')
 #print(x_train)
@@ -118,8 +118,7 @@ y_train = Y_true_train
 y_test = Y_true_test
 y_mask_train = Y_mask_train
 y_mask_test = Y_mask_test
-#print('x_train:')
-#print(x_train.shape)
+
 norm_stats = {'audioset':[-4.2677393, 4.5689974], 'esc50':[-6.6268077, 5.358466], 'speechcommands':[-6.845978, 5.5654526], 'openmic': [0,0]}
 target_length = {'audioset':1024, 'esc50':512, 'speechcommands':128, 'openmic':1024}
     # if add noise for data augmentation, only use for speech commands

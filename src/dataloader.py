@@ -1,3 +1,4 @@
+# modified from:
 # -*- coding: utf-8 -*-
 # @Time    : 6/19/21 12:23 AM
 # @Author  : Yuan Gong
@@ -5,9 +6,7 @@
 # @Email   : yuangong@mit.edu
 # @File    : dataloader.py
 
-# modified from:
-# Author: David Harwath
-# with some functions borrowed from https://github.com/SeanNaren/deepspeech.pytorch
+
 
 import csv
 import json
@@ -277,10 +276,6 @@ class OpenMicDataset(Dataset):
         elif p < 0:
             fbank = fbank[0:target_length, :]
         
-        #reprogramming layer
-        #repro = nn.Parameter(torch.randn((1024,128),requires_grad=True))
-        #fbank = fbank + repro
-        
         
         if filename2 == None:
             return fbank, 0
@@ -299,24 +294,15 @@ class OpenMicDataset(Dataset):
         #label_indices = np.zeros(self.label_num)
         mask = np.zeros(self.label_num)
         datum = torch.from_numpy(datum)
-        #print('datum.shape')
-        #print(datum.shape)
         datum = datum[None, :]
         datum = datum.float()
-        #print('torch datum.shape')
-        #print(datum[0][1])
-        #waveform.shape
-        #torch.Size([1, 80000])
-        
-        
+
         fbank, mix_lambda = self._wav2fbank(datum)
         #for label_str in datum['labels'].split(','):
         #    label_indices[int(self.index_dict[label_str])] = 1.0
 
         label_indices = self.y[index]
-        #print('===debug===')
-        #print(index)
-        #print(label_indices)
+        
         mask = self.y_mask[index]
         
         # SpecAug, not do for eval set

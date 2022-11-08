@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-# @Time    : 6/10/21 5:04 PM
-# @Author  : Yuan Gong
-# @Affiliation  : Massachusetts Institute of Technology
-# @Email   : yuangong@mit.edu
-# @File    : ast_models.py
+# modified from:
 
 import torch
 import torch.nn as nn
@@ -151,15 +146,8 @@ class ASTModel(nn.Module):
             
             ##reprogram layer
             self.repr = nn.Parameter(torch.Tensor(1,1024,128))
-            #self.mean = nn.Parameter(torch.Tensor(1))
-            #self.std = nn.Parameter(torch.Tensor(1))
-            #self.gaussian = nn.Parameter(torch.normal(0, 1, size=(1024, 128)))
             self.re_cnn = torch.nn.Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=1)
             self.re_cnn_2 = torch.nn.Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=1)
-            #self.delta = torch.nn.Parameter(torch.Tensor(1,1024,128), requires_grad=True)
-            #torch.nn.init.xavier_uniform_(self.delta)
-            #self.delta = torch.nn.Parameter(torch.Tensor(1,1024,128), requires_grad=True)
-            #torch.nn.init.normal_(self.delta)
             self.unet_1 = nn.Sequential(nn.Conv2d(1, 4, kernel_size=3, padding=1, bias=False),
                                         nn.BatchNorm2d(4),
                                         nn.ReLU(inplace=True),
@@ -201,14 +189,6 @@ class ASTModel(nn.Module):
         :return: prediction
         """
         # expect input x = (batch_size, time_frame_num, frequency_bins), e.g., (12, 1024, 128)
-       #print('x size')
-       # print(x.size(dim=0))24
-       # print(x.size(dim=1))1024
-       # print(x.size(dim=2))128
-        #x = x + self.delta.repeat(x.size(dim=0),1,1)
-        
-        
-        
         x = x.unsqueeze(1)
         x1 = self.unet_1(x)
         x2 = self.unet_2(x1)
@@ -224,10 +204,7 @@ class ASTModel(nn.Module):
         #x = self.re_cnn(x)
         #x = self.re_cnn_2(x)
         #x = x + self.repr.repeat(x.size(dim=0),1,1,1)
-        #print(x.size(dim=0))#4
-        #print(x.size(dim=1))#1
-        #print(x.size(dim=2))#1024
-        #print(x.size(dim=3))#128
+        
         x = x.transpose(2, 3)
         
         #

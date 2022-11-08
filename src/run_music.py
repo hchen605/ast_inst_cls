@@ -1,3 +1,4 @@
+# modified from:
 # -*- coding: utf-8 -*-
 # @Time    : 6/11/21 12:57 AM
 # @Author  : Yuan Gong
@@ -34,14 +35,6 @@ print('== check GPU ==')
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 print('current device: ', torch.cuda.current_device())
 print(torch.cuda.get_device_name(torch.cuda.current_device()))
-#print(torch.cuda.get_device_name(1))
-#torch.cuda.set_device(1)
-#print(torch.cuda.current_device())
-#print(torch.cuda.device_count() )
-
-#print(torch.cuda.memory_summary())
-
-
 
 print("I am process %s, running on %s: starting (%s)" % (os.getpid(), os.uname()[1], time.asctime()))
 
@@ -114,22 +107,16 @@ Y_mask_train = Y_mask[idx_train]
 Y_mask_test = Y_mask[idx_test]
 
 print('loading data ..,')
-#x_train = load_data(args.data_train)
-#np.save('train_music',x_train)
-#x_test = load_data(args.data_val)
-#np.save('test_music',x_test)
-#print(x_train)
-##print(x_train[1])
+
 
 x_train = np.load('train_music.npy')
 x_test = np.load('test_music.npy')
-#print(x_train)
+
 y_train = Y_true_train
 y_test = Y_true_test
 y_mask_train = Y_mask_train
 y_mask_test = Y_mask_test
-#print('x_train:')
-#print(x_train.shape)
+
 
 # transformer based model
 if args.model == 'ast':
@@ -186,32 +173,4 @@ with open("%s/args.pkl" % args.exp_dir, "wb") as f:
 print('Now starting training for {:d} epochs'.format(args.n_epochs))
 #print(torch.cuda.memory_summary())
 train(audio_model, train_loader, val_loader, args)
-
-# for speechcommands dataset, evaluate the best model on validation set on the test set
-if args.dataset == 'speechcommands':
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    sd = torch.load(args.exp_dir + '/models/best_audio_model.pth', map_location=device)
-    audio_model = torch.nn.DataParallel(audio_model)
-    audio_model.load_state_dict(sd)
-
-    # best model on the validation set
-    stats, _ = validate(audio_model, val_loader, args, 'valid_set')
-    # note it is NOT mean of class-wise accuracy
-    val_acc = stats[0]['acc']
-    val_mAUC = np.mean([stat['auc'] for stat in stats])
-    print('---------------evaluate on the validation set---------------')
-    print("Accuracy: {:.6f}".format(val_acc))
-    print("AUC: {:.6f}".format(val_mAUC))
-
-    # test the model on the evaluation set
-    eval_loader = torch.utils.data.DataLoader(
-        dataloader.AudiosetDataset(args.data_eval, label_csv=args.label_csv, audio_conf=val_audio_conf),
-        batch_size=args.batch_size*2, shuffle=False, num_workers=args.num_workers, pin_memory=True)
-    stats, _ = validate(audio_model, eval_loader, args, 'eval_set')
-    eval_acc = stats[0]['acc']
-    eval_mAUC = np.mean([stat['auc'] for stat in stats])
-    print('---------------evaluate on the test set---------------')
-    print("Accuracy: {:.6f}".format(eval_acc))
-    print("AUC: {:.6f}".format(eval_mAUC))
-    np.savetxt(args.exp_dir + '/eval_result.csv', [val_acc, val_mAUC, eval_acc, eval_mAUC])
 

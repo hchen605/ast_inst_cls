@@ -86,11 +86,7 @@ def metric_fn_openmic(Y_true, Y_mask, preds, threshold=0.5):
         labels[labels >= threshold] = 1
         labels[labels < 1] = 0
         
-        #print(labels)
-        #print(predictions)
-#     print(classification_report(
-#         labels[relevant_inds], predictions[relevant_inds]))
-    # return classification report
+        
         results = classification_report(labels[relevant_inds], predictions[relevant_inds], output_dict=True)
 
         avg_fscore_weighted.append(results['weighted avg']['f1-score'])

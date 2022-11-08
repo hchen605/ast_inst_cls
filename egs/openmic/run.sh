@@ -1,17 +1,6 @@
 #!/bin/bash
-#SBATCH -p gpu
-#SBATCH -x sls-titan-[0-2]
-#SBATCH --gres=gpu:4
-#SBATCH -c 4
-#SBATCH -n 1
-#SBATCH --mem=48000
-#SBATCH --job-name="ast-esc50"
-#SBATCH --output=./log_%j.txt
 
 set -x
-# comment this line if not running on sls cluster
-#. /data/sls/scratch/share-201907/slstoolchainrc
-#source ../../venvast/bin/activate
 export TORCH_HOME=../../pretrained_models
 
 model=ast
@@ -34,20 +23,12 @@ fstride=10
 tstride=10
 base_exp_dir=./exp/test-${dataset}-imp$imagenetpretrain-asp$audiosetpretrain-b$batch_size-lr${lr}_nor
 
-#python ./prep_esc50.py
-
-#if [ -d $base_exp_dir ]; then
-#  echo 'exp exist'
-#  exit
-#fi
-#mkdir -p $base_exp_dir
-
 
 echo 'now process fold'${fold}
 
 exp_dir=${base_exp_dir}/
 train_csv=/home/hc605/dataset/openmic-2018/train_music_full.csv
-#dev_csv=/home/hchen605/microphone_classification_add_feat/12class/data/dev_full.csv
+dev_csv=/home/hchen605/microphone_classification_add_feat/12class/data/dev_full.csv
 test_csv=/home/hc605/dataset/openmic-2018/test_music_full.csv
 
   

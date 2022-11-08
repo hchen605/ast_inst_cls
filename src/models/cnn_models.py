@@ -1,5 +1,4 @@
 
-
 import torch
 import torch.nn as nn
 from torch.cuda.amp import autocast
@@ -19,11 +18,6 @@ class CNNModel(nn.Module):
         self.re_cnn_2 = torch.nn.Conv2d(1, 1, kernel_size=(3, 3), stride=(1, 1), padding=1)
         
         self.mlp_head = nn.Sequential(nn.Linear(1024*128, label_dim))
-        #self.mlp_head_2 = nn.Sequential(nn.LayerNorm(self.original_embedding_dim), nn.Linear(self.original_embedding_dim, label_dim),
-          #nn.Linear(label_dim, label_dim),                                
-         #nn.Linear(label_dim, label_dim)                              )
-
-        #.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0
         
         
         
@@ -39,12 +33,7 @@ class CNNModel(nn.Module):
         x = x.unsqueeze(1)
         x = F.relu(self.re_cnn(x))
         x = F.relu(self.re_cnn_2(x))
-        #x = x + self.repr.repeat(x.size(dim=0),1,1,1)
-        #print(x.size(dim=0))#4
-        #print(x.size(dim=1))#1
-        #print(x.size(dim=2))#1024
-        #print(x.size(dim=3))#128
-        #x = x.transpose(2, 3)
+        
         x = torch.flatten(x, 1)
         #torch.flatten(input, start_dim=0, end_dim=- 1)
         
